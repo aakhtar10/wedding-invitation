@@ -16,7 +16,7 @@
 @theme {
     --font-allura: "Allura", cursive;
 
-  --color-wedding-primary: #173f35;
+  --color-wedding-primary: #f7efe2;
   --color-wedding-gold: #c9a96e;
   --color-wedding-gold-light: #b97d6d;
   --color-wedding-gold-dark: #a98252;
@@ -26,24 +26,97 @@
 
   --color-wedding-text: #ac897c;
   --color-wedding-muted: #756f65;
+--font-heading: "Allura", cursive;
+  --font-body: "Montserrat", sans-serif;
+  --font-script: "Cormorant Garamond", serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ================================
+   WEDDING TYPOGRAPHY
+================================ */
+
+:root {
+  --text-primary: #4a3b32;
+  --text-secondary: #806f63;
+  --text-muted: #9a8b81;
+  --text-accent: #9b6f68;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Main page headings */
+.wedding-heading {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: clamp(42px, 6vw, 7rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Section headings */
+.wedding-section-title {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+/* Small uppercase labels */
+.wedding-eyebrow {
+  color: var(--text-accent);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+/* Normal wedding text */
+.wedding-body {
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  font-weight: 400;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+}
+
+/* Small supporting text */
+.wedding-caption {
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+}
+
+/* Couple names */
+.wedding-names {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  font-weight: 400;
+  line-height: 0.9;
+}
+
+/* Arabic / Quran */
+.wedding-arabic {
+  color: var(--text-primary);
+  font-family: serif;
+  font-size: clamp(1.7rem, 4vw, 3rem);
+  font-weight: 400;
+  line-height: 1.8;
+}
+
+/* Quote translation */
+.wedding-quote {
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  font-weight: 400;
+  line-height: 1.8;
+  font-style: italic;
 }

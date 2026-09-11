@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function WeddingOpening() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -20,6 +20,7 @@ export default function WeddingOpening() {
 
     video.currentTime = 0;
     video.muted = true;
+    video.playbackRate = 1.25;
 
     try {
       await video.play();
@@ -29,8 +30,31 @@ export default function WeddingOpening() {
     }
   };
 
+  const handleVideoEnd = () => {
+    setVideoEnded(true);
+
+    // Give the reveal animation time to complete
+    setTimeout(() => {
+      // Unlock normal page scrolling
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }, 3000);
+  };
+
+  useEffect(() => {
+    // Lock page scrolling while opening is active
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      // Always restore scrolling
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, []);
+
   return (
-    <main className="fixed inset-0 z-50 overflow-hidden bg-wedding-primary">
+    <section className="relative h-screen w-full overflow-hidden bg-wedding-primary">
       {/* VIDEO */}
       <video
         ref={videoRef}
@@ -38,7 +62,7 @@ export default function WeddingOpening() {
         muted
         playsInline
         preload="auto"
-        onEnded={() => setVideoEnded(true)}
+        onEnded={handleVideoEnd}
         className="absolute inset-0 h-full w-full object-cover"
       />
 
@@ -50,8 +74,12 @@ export default function WeddingOpening() {
             onClick={handleOpen}
             className="absolute inset-0 z-20 h-full w-full"
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
+            exit={{
+              opacity: 0,
+              transition: {
+                duration: 0.8,
+              },
+            }}
           >
             <Image
               src="/wedding/opening.webp"
@@ -121,10 +149,12 @@ export default function WeddingOpening() {
       <AnimatePresence>
         {videoEnded && (
           <motion.div
-            className="absolute inset-0 z-10 flex items-center justify-center overflow-y-auto px-5 py-8"
+            className="absolute inset-0 z-10 flex items-center justify-center px-5 py-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
+            transition={{
+              duration: 1,
+            }}
           >
             <motion.div
               initial={{
@@ -139,13 +169,9 @@ export default function WeddingOpening() {
                 duration: 1,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="relative w-full max-w-md px-7 py-10 text-center text-white"
+              className="relative w-full max-w-md px-7 py-10 text-center"
             >
-             
-
-              {/* =========================
-                  BISMILLAH
-              ========================== */}
+              {/* BISMILLAH */}
 
               <motion.div
                 initial={{
@@ -169,7 +195,8 @@ export default function WeddingOpening() {
                 </p>
               </motion.div>
 
-              {/* Bismillah translation */}
+              {/* TRANSLATION */}
+
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -184,9 +211,7 @@ export default function WeddingOpening() {
                 the Most Merciful
               </motion.p>
 
-              {/* =========================
-                  INTRO
-              ========================== */}
+              {/* INTRO */}
 
               <motion.p
                 initial={{ opacity: 0 }}
@@ -195,14 +220,12 @@ export default function WeddingOpening() {
                   delay: 0.6,
                   duration: 0.8,
                 }}
-                className="mb-4 text-[9px] font-sans uppercase tracking-[0.28em] text-[#5a4035]"
+                className="mb-4 font-sans text-[9px] uppercase tracking-[0.28em] text-[#5a4035]"
               >
                 Together with their families
               </motion.p>
 
-              {/* =========================
-                  GROOM
-              ========================== */}
+              {/* GROOM */}
 
               <motion.div
                 initial={{
@@ -227,9 +250,7 @@ export default function WeddingOpening() {
                 </p>
               </motion.div>
 
-              {/* =========================
-                  AMPERSAND
-              ========================== */}
+              {/* AMPERSAND */}
 
               <motion.div
                 initial={{
@@ -249,9 +270,7 @@ export default function WeddingOpening() {
                 &amp;
               </motion.div>
 
-              {/* =========================
-                  BRIDE
-              ========================== */}
+              {/* BRIDE */}
 
               <motion.div
                 initial={{
@@ -276,9 +295,7 @@ export default function WeddingOpening() {
                 </p>
               </motion.div>
 
-              {/* =========================
-                  BOTTOM ORNAMENT
-              ========================== */}
+              {/* ORNAMENT */}
 
               <motion.div
                 initial={{
@@ -305,6 +322,6 @@ export default function WeddingOpening() {
           </motion.div>
         )}
       </AnimatePresence>
-    </main>
+    </section>
   );
 }
