@@ -1,8 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --wedding-primary: #173f35;
+  --wedding-gold: #c9a96e;
+  --wedding-gold-light: #e5c98a;
+  --wedding-ivory: #f8f4ec;
+  --wedding-surface: #fffdf8;
+  --wedding-text: #24312c;
+  --wedding-muted: #756f65;
+  --wedding-gold-dark: #a98252;
+}
+
+@import "tailwindcss";
+
+@theme {
+    --font-allura: "Allura", cursive;
+
+  --color-wedding-primary: #173f35;
+  --color-wedding-gold: #c9a96e;
+  --color-wedding-gold-light: #b97d6d;
+  --color-wedding-gold-dark: #a98252;
+
+  --color-wedding-ivory: #f8f4ec;
+  --color-wedding-surface: #fffdf8;
+
+  --color-wedding-text: #ac897c;
+  --color-wedding-muted: #756f65;
 }
 
 @theme inline {

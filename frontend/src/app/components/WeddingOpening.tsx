@@ -14,7 +14,7 @@ export default function WeddingOpening() {
     const video = videoRef.current;
 
     if (!video) {
-      console.log("Video element not found");
+      console.error("Video element not found");
       return;
     }
 
@@ -23,20 +23,15 @@ export default function WeddingOpening() {
 
     try {
       await video.play();
-
-      // Only hide the image after video successfully starts
       setIsOpened(true);
-
-      console.log("Video started");
     } catch (error) {
       console.error("Video failed to play:", error);
     }
   };
 
   return (
-    <main className="fixed inset-0 z-50 overflow-hidden bg-black">
-
-      {/* VIDEO IS ALWAYS PRESENT */}
+    <main className="fixed inset-0 z-50 overflow-hidden bg-wedding-primary">
+      {/* VIDEO */}
       <video
         ref={videoRef}
         src="/wedding/opening.mp4"
@@ -67,48 +62,245 @@ export default function WeddingOpening() {
               className="object-cover"
             />
 
+            {/* WAVY OPEN CIRCLE */}
             <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ opacity: 0.5 }}
+              animate={{ opacity: 1 }}
               transition={{
                 delay: 0.5,
                 duration: 0.8,
               }}
-              className="absolute inset-x-0 bottom-16 flex justify-center"
             >
-              <div className="rounded-full bg-black/40 px-6 py-3 text-sm tracking-[0.25em] text-white backdrop-blur-sm">
-                TAP TO OPEN
-              </div>
+              <motion.div
+                className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/70 bg-white/10 backdrop-blur-sm"
+                animate={{
+                  scale: [1, 1.08, 1],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                {/* WAVE 1 */}
+                <motion.span
+                  className="absolute inset-0 rounded-full border border-white/40"
+                  animate={{
+                    scale: [1, 2],
+                    opacity: [0.6, 0],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeOut",
+                  }}
+                />
+
+                {/* WAVE 2 */}
+                <motion.span
+                  className="absolute inset-0 rounded-full border border-white/30"
+                  animate={{
+                    scale: [1, 1.7],
+                    opacity: [0.5, 0],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: 0.6,
+                    ease: "easeOut",
+                  }}
+                />
+              </motion.div>
             </motion.div>
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* TEXT AFTER VIDEO ENDS */}
+      {/* WEDDING REVEAL */}
       <AnimatePresence>
         {videoEnded && (
           <motion.div
-            className="absolute inset-0 z-10 flex items-center justify-center"
+            className="absolute inset-0 z-10 flex items-center justify-center overflow-y-auto px-5 py-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
           >
             <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{
+                opacity: 0,
+                y: 25,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
               transition={{
-                duration: 1.2,
+                duration: 1,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="text-center text-white"
+              className="relative w-full max-w-md px-7 py-10 text-center text-white"
             >
-              <p className="mb-4 text-sm uppercase tracking-[0.35em]">
-                Together with their families
-              </p>
+             
 
-              <h1 className="font-serif text-5xl">
-                Arsalan & Maria
-              </h1>
+              {/* =========================
+                  BISMILLAH
+              ========================== */}
+
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: -10,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  duration: 1,
+                }}
+                className="relative z-10 mb-3"
+              >
+                <p
+                  dir="rtl"
+                  className="font-serif text-xl leading-loose text-[#5a4035]"
+                >
+                  ﷽
+                </p>
+              </motion.div>
+
+              {/* Bismillah translation */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  delay: 0.3,
+                  duration: 0.8,
+                }}
+                className="mb-7 font-sans text-[9px] uppercase tracking-[0.2em] text-[#5a4035]"
+              >
+                In the name of Allah, the Most Gracious,
+                <br />
+                the Most Merciful
+              </motion.p>
+
+              {/* =========================
+                  INTRO
+              ========================== */}
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{
+                  delay: 0.6,
+                  duration: 0.8,
+                }}
+                className="mb-4 text-[9px] font-sans uppercase tracking-[0.28em] text-[#5a4035]"
+              >
+                Together with their families
+              </motion.p>
+
+              {/* =========================
+                  GROOM
+              ========================== */}
+
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: 15,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  delay: 0.9,
+                  duration: 0.9,
+                }}
+              >
+                <h1 className="font-allura text-2xl leading-tight text-wedding-gold-light">
+                  Arsalan Akhtar
+                </h1>
+
+                <p className="mt-1 font-sans text-[10px] leading-relaxed text-[#5a4035]">
+                  Son of Md Sohail Akhtar &amp; Gazala Perween
+                </p>
+              </motion.div>
+
+              {/* =========================
+                  AMPERSAND
+              ========================== */}
+
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.7,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+                transition={{
+                  delay: 1.2,
+                  duration: 0.7,
+                }}
+                className="my-3 font-serif text-xl text-wedding-gold"
+              >
+                &amp;
+              </motion.div>
+
+              {/* =========================
+                  BRIDE
+              ========================== */}
+
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: 15,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                transition={{
+                  delay: 1.4,
+                  duration: 0.9,
+                }}
+              >
+                <h1 className="font-allura text-2xl leading-tight text-wedding-gold-light">
+                  Maria Bin-tul Islam
+                </h1>
+
+                <p className="mt-1 font-sans text-[10px] leading-relaxed text-[#5a4035]">
+                  Daughter of Md Khaliq &amp; Shabnam Perween
+                </p>
+              </motion.div>
+
+              {/* =========================
+                  BOTTOM ORNAMENT
+              ========================== */}
+
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scaleX: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                  scaleX: 1,
+                }}
+                transition={{
+                  delay: 1.8,
+                  duration: 0.8,
+                }}
+                className="mx-auto mt-6 flex items-center justify-center gap-2"
+              >
+                <span className="h-px w-10 bg-wedding-gold/60" />
+
+                <span className="h-1.5 w-1.5 rotate-45 bg-wedding-gold" />
+
+                <span className="h-px w-10 bg-wedding-gold/60" />
+              </motion.div>
             </motion.div>
           </motion.div>
         )}
