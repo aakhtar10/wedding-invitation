@@ -33,21 +33,17 @@ export default function WeddingOpening() {
   const handleVideoEnd = () => {
     setVideoEnded(true);
 
-    // Give the reveal animation time to complete
     setTimeout(() => {
-      // Unlock normal page scrolling
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
     }, 3000);
   };
 
   useEffect(() => {
-    // Lock page scrolling while opening is active
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
 
     return () => {
-      // Always restore scrolling
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
     };
@@ -172,7 +168,6 @@ export default function WeddingOpening() {
               className="relative w-full max-w-md px-7 py-10 text-center"
             >
               {/* BISMILLAH */}
-
               <motion.div
                 initial={{
                   opacity: 0,
@@ -187,16 +182,12 @@ export default function WeddingOpening() {
                 }}
                 className="relative z-10 mb-3"
               >
-                <p
-                  dir="rtl"
-                  className="font-serif text-xl leading-loose text-[#5a4035]"
-                >
+                <p dir="rtl" className="wedding-arabic">
                   ﷽
                 </p>
               </motion.div>
 
               {/* TRANSLATION */}
-
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -204,7 +195,7 @@ export default function WeddingOpening() {
                   delay: 0.3,
                   duration: 0.8,
                 }}
-                className="mb-7 font-sans text-[9px] uppercase tracking-[0.2em] text-[#5a4035]"
+                className="wedding-caption mb-7"
               >
                 In the name of Allah, the Most Gracious,
                 <br />
@@ -212,7 +203,6 @@ export default function WeddingOpening() {
               </motion.p>
 
               {/* INTRO */}
-
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -220,13 +210,12 @@ export default function WeddingOpening() {
                   delay: 0.6,
                   duration: 0.8,
                 }}
-                className="mb-4 font-sans text-[9px] uppercase tracking-[0.28em] text-[#5a4035]"
+                className="wedding-eyebrow mb-4"
               >
                 Together with their families
               </motion.p>
 
               {/* GROOM */}
-
               <motion.div
                 initial={{
                   opacity: 0,
@@ -241,17 +230,16 @@ export default function WeddingOpening() {
                   duration: 0.9,
                 }}
               >
-                <h1 className="font-allura text-2xl leading-tight text-wedding-gold-light">
+                <h1 className="wedding-names text-wedding-gold-light">
                   Arsalan Akhtar
                 </h1>
 
-                <p className="mt-1 font-sans text-[10px] leading-relaxed text-[#5a4035]">
+                <p className="wedding-caption mt-2">
                   Son of Md Sohail Akhtar &amp; Gazala Perween
                 </p>
               </motion.div>
 
               {/* AMPERSAND */}
-
               <motion.div
                 initial={{
                   opacity: 0,
@@ -265,13 +253,12 @@ export default function WeddingOpening() {
                   delay: 1.2,
                   duration: 0.7,
                 }}
-                className="my-3 font-serif text-xl text-wedding-gold"
+                className="my-3 wedding-names"
               >
                 &amp;
               </motion.div>
 
               {/* BRIDE */}
-
               <motion.div
                 initial={{
                   opacity: 0,
@@ -286,17 +273,16 @@ export default function WeddingOpening() {
                   duration: 0.9,
                 }}
               >
-                <h1 className="font-allura text-2xl leading-tight text-wedding-gold-light">
+                <h1 className="wedding-names text-wedding-gold-light">
                   Maria Bin-tul Islam
                 </h1>
 
-                <p className="mt-1 font-sans text-[10px] leading-relaxed text-[#5a4035]">
+                <p className="wedding-caption mt-2">
                   Daughter of Md Khaliq &amp; Shabnam Perween
                 </p>
               </motion.div>
 
               {/* ORNAMENT */}
-
               <motion.div
                 initial={{
                   opacity: 0,

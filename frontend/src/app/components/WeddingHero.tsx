@@ -14,12 +14,12 @@ export default function WeddingHero() {
           fill
           priority
           sizes="100vw"
-          className="object-fill"
+          className="object-cover"
         />
       </div>
 
       {/* Hero Content */}
-    <div className="relative z-10 flex max-w-2xl flex-col items-center px-6 text-center">
+    <div className="relative z-10 mt-[20px] flex max-w-2xl flex-col items-center px-6 text-center">
 
     <p className="wedding-heading">
       A Blessed Beginning
@@ -49,7 +49,7 @@ export default function WeddingHero() {
         Maria
       </h1>
 
-      <span className="wedding-caption mx-4">
+      <span className="wedding-names mx-4">
         &
       </span>
 
