@@ -50,7 +50,7 @@ export default function WeddingOpening() {
   }, []);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-wedding-primary">
+    <section className="relative h-[100dvh] w-full overflow-hidden bg-wedding-primary">
       {/* VIDEO */}
       <video
         ref={videoRef}
