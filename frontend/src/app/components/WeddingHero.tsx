@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function WeddingHero() {
   return (
-    <section className="relative flex  flex-col items-center justify-center  px-6 text-center bg-wedding-primary min-h-[70dvh]">
+    <section className="relative flex  flex-col items-center justify-center  px-6 text-center bg-wedding-primary min-h-[600px]">
       
       {/* Top Floral Separator */}
       <div className="absolute left-0 top-[-40px] h-[110px] w-full">

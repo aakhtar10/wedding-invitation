@@ -1,56 +1,41 @@
 "use client";
 
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-export default function WeddingOpening() {
+interface WeddingOpeningProps {
+  isOpened: boolean;
+}
+
+export default function WeddingOpening({
+  isOpened,
+}: WeddingOpeningProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [isOpened, setIsOpened] = useState(false);
   const [videoEnded, setVideoEnded] = useState(false);
 
-  const handleOpen = async () => {
+  useEffect(() => {
+    if (!isOpened) return;
+
     const video = videoRef.current;
 
-    if (!video) {
-      console.error("Video element not found");
-      return;
-    }
+    if (!video) return;
 
     video.currentTime = 0;
     video.muted = true;
     video.playbackRate = 1.25;
 
-    try {
-      await video.play();
-      setIsOpened(true);
-    } catch (error) {
+    video.play().catch((error) => {
       console.error("Video failed to play:", error);
-    }
-  };
+    });
+  }, [isOpened]);
 
   const handleVideoEnd = () => {
     setVideoEnded(true);
-
-    setTimeout(() => {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-    }, 3000);
   };
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-    };
-  }, []);
-
   return (
-    <section className="relative h-[100dvh] w-full overflow-hidden bg-wedding-primary">
+    <section className="relative h-[110vh] w-full overflow-hidden bg-wedding-primary">
       {/* VIDEO */}
       <video
         ref={videoRef}
@@ -62,95 +47,14 @@ export default function WeddingOpening() {
         className="absolute inset-0 h-full w-full object-cover"
       />
 
-      {/* OPENING IMAGE */}
-      <AnimatePresence>
-        {!isOpened && (
-          <motion.button
-            type="button"
-            onClick={handleOpen}
-            className="absolute inset-0 z-20 h-full w-full"
-            initial={{ opacity: 1 }}
-            exit={{
-              opacity: 0,
-              transition: {
-                duration: 0.8,
-              },
-            }}
-          >
-            <Image
-              src="/wedding/opening.webp"
-              alt="Wedding invitation"
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-
-            {/* WAVY OPEN CIRCLE */}
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center"
-              initial={{ opacity: 0.5 }}
-              animate={{ opacity: 1 }}
-              transition={{
-                delay: 0.5,
-                duration: 0.8,
-              }}
-            >
-              <motion.div
-                className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/70 bg-white/10 backdrop-blur-sm"
-                animate={{
-                  scale: [1, 1.08, 1],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                {/* WAVE 1 */}
-                <motion.span
-                  className="absolute inset-0 rounded-full border border-white/40"
-                  animate={{
-                    scale: [1, 2],
-                    opacity: [0.6, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeOut",
-                  }}
-                />
-
-                {/* WAVE 2 */}
-                <motion.span
-                  className="absolute inset-0 rounded-full border border-white/30"
-                  animate={{
-                    scale: [1, 1.7],
-                    opacity: [0.5, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: 0.6,
-                    ease: "easeOut",
-                  }}
-                />
-              </motion.div>
-            </motion.div>
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      {/* WEDDING REVEAL */}
+      {/* WEDDING CONTENT */}
       <AnimatePresence>
         {videoEnded && (
           <motion.div
             className="absolute inset-0 z-10 flex items-center justify-center px-5 py-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{
-              duration: 1,
-            }}
+            transition={{ duration: 1 }}
           >
             <motion.div
               initial={{
