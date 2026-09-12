@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import WeddingHero from "./components/WeddingHero";
 import WeddingOpening from "./components/WeddingOpening";
+import WeddingScratch from "./components/WeddingScratch";
 
 export default function WeddingPage() {
   const [isOpened, setIsOpened] = useState(false);
@@ -85,6 +86,7 @@ export default function WeddingPage() {
 
       {/* HERO */}
       <WeddingHero />
+      <WeddingScratch/>
 
       {/* Next sections */}
     </main>
