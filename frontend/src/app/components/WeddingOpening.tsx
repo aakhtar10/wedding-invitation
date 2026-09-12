@@ -187,27 +187,67 @@ export default function WeddingOpening({
               </motion.div>
 
               {/* ORNAMENT */}
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  scaleX: 0,
-                }}
-                animate={{
-                  opacity: 1,
-                  scaleX: 1,
-                }}
-                transition={{
-                  delay: 1.8,
-                  duration: 0.8,
-                }}
-                className="mx-auto mt-6 flex items-center justify-center gap-2"
-              >
-                <span className="h-px w-10 bg-wedding-gold/60" />
+<motion.div
+  initial={{
+    opacity: 0,
+    scaleX: 0,
+  }}
+  animate={{
+    opacity: 1,
+    scaleX: 1,
+  }}
+  transition={{
+    delay: 1.8,
+    duration: 0.8,
+  }}
+  className="mx-auto mt-6 flex items-center justify-center gap-2"
+>
+  <span className="h-px w-10 bg-wedding-gold/60" />
 
-                <span className="h-1.5 w-1.5 rotate-45 bg-wedding-gold" />
+  <span className="h-1.5 w-1.5 rotate-45 bg-wedding-gold" />
 
-                <span className="h-px w-10 bg-wedding-gold/60" />
-              </motion.div>
+  <span className="h-px w-10 bg-wedding-gold/60" />
+</motion.div>
+
+{/* SCROLL INDICATOR */}
+<motion.div
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{
+    delay: 2.3,
+    duration: 0.8,
+  }}
+  className="mt-8 flex flex-col items-center gap-2"
+>
+  <span className="text-[9px] uppercase tracking-[0.3em] text-wedding-gold-light/80">
+    Scroll to explore
+  </span>
+
+  <motion.div
+    animate={{
+      y: [0, 6, 0],
+    }}
+    transition={{
+      duration: 1.5,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }}
+    className="flex h-8 w-5 items-start justify-center rounded-full border border-wedding-gold/50 p-1"
+  >
+    <motion.span
+      animate={{
+        y: [0, 10, 0],
+        opacity: [1, 0.3, 1],
+      }}
+      transition={{
+        duration: 1.5,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+      className="h-1.5 w-1 rounded-full bg-wedding-gold"
+    />
+  </motion.div>
+</motion.div>
             </motion.div>
           </motion.div>
         )}

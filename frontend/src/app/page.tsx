@@ -23,7 +23,6 @@ export default function WeddingPage() {
               h-[110vh]
               w-full
               cursor-pointer
-              overflow-hidden
               overscroll-none
               touch-none
             "
