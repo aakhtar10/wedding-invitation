@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Gift } from "lucide-react";
 import Image from "next/image";
 
 export default function WeddingScratch() {
@@ -153,7 +152,7 @@ export default function WeddingScratch() {
     const percentage =
       transparent / (imageData.data.length / 4);
 
-    if (percentage > 0.45) {
+    if (percentage > 0.30) {
       setRevealed(true);
     }
   };
@@ -211,7 +210,7 @@ export default function WeddingScratch() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative mx-auto mt-10 aspect-[1.7/1] w-full max-w-sm overflow-hidden rounded-2xl border border-wedding-gold/40 bg-wedding-surface shadow-xl"
+          className="relative mx-auto mt-10 aspect-[1.7/1] w-full max-w-sm  rounded-2xl border border-wedding-gold/40 bg-wedding-surface shadow-xl"
         >
       {/* REVEALED CONTENT */}
 <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center">

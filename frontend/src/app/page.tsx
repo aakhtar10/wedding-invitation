@@ -2,13 +2,17 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import {  useState } from "react";
 import WeddingHero from "./components/WeddingHero";
 import WeddingOpening from "./components/WeddingOpening";
 import WeddingScratch from "./components/WeddingScratch";
+import WeddingCountdown from "./components/WeddingCountdown";
+import WeddingCeremonies from "./components/WeddingCeremonies";
 
 export default function WeddingPage() {
   const [isOpened, setIsOpened] = useState(false);
+
+  
 
   return (
     <main className="flex flex-col">
@@ -87,6 +91,8 @@ export default function WeddingPage() {
       {/* HERO */}
       <WeddingHero />
       <WeddingScratch/>
+      <WeddingCountdown/>
+      <WeddingCeremonies/>
 
       {/* Next sections */}
     </main>
