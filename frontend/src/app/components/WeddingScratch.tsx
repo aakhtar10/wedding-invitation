@@ -84,8 +84,7 @@ export default function WeddingScratch() {
     const petal = confetti.shapeFromPath({
       path: "M0 0 C0 -14 14 -14 14 0 C14 14 0 14 0 0 Z",
     });
-    const blossom = confetti.shapeFromText({ text: "🌸", scalar: 2.2 });
-    const rose = confetti.shapeFromText({ text: "🌺", scalar: 2.2 });
+    
 
     const base = { disableForReducedMotion: true, zIndex: 100 };
 
@@ -126,7 +125,7 @@ export default function WeddingScratch() {
         ticks: 260,
         origin: { x, y: 0.95 },
         colors: [...GOLD, ...BLUSH],
-        shapes: [petal, blossom, rose],
+        shapes: [petal],
         scalar: 1.5,
       });
 
@@ -155,7 +154,7 @@ export default function WeddingScratch() {
           ticks: 520,
           origin: { x: Math.random(), y: -0.05 },
           colors: BLUSH,
-          shapes: [petal, blossom],
+          shapes: [petal,],
           scalar: 1.4 + Math.random() * 0.6,
         });
       }
