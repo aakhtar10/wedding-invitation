@@ -5,14 +5,12 @@
 
 .scroll-stack-inner {
   width: 100%;
-  padding: 8vh 1.5rem 45vh;
+  padding: 2.5rem 1.5rem 12vh;
 }
 
 .scroll-stack-card {
   position: sticky;
   width: 100%;
-  min-height: 32rem;
-
   box-sizing: border-box;
 
   transform-origin: top center;
@@ -22,10 +20,7 @@
 
   will-change: transform;
 
-  /*
-   * Important:
-   * Don't add overflow here.
-   */
+  /* Important: don't add overflow here. It breaks sticky. */
   overflow: visible;
 }
 
@@ -38,9 +33,5 @@
   .scroll-stack-inner {
     padding-left: 2rem;
     padding-right: 2rem;
-  }
-
-  .scroll-stack-card {
-    min-height: 36rem;
   }
 }

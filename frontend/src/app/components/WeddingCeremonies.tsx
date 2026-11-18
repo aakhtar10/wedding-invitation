@@ -42,24 +42,20 @@ export default function WeddingCeremonies() {
       </div>
 
       <ScrollStack
-        itemDistance={80}
+        itemDistance={48}
         itemScale={0.03}
-        itemStackDistance={30}
-        stackPosition="18%"
-        scaleEndPosition="8%"
-        baseScale={0.90}
-        rotationAmount={0}
-        blurAmount={0}
+        itemStackDistance={22}
+        stackPosition="5rem"
+        baseScale={0.9}
       >
         <ScrollStackItem>
           <CeremonyCard
             number="01"
             title="Haldi"
             subtitle="A joyful beginning"
-            icon="🌼"
-            date="26 December 2027"
-            time="11:00 AM"
-            venue="Your Haldi Venue"
+            date="25 December 2026"
+            time="06:00 PM"
+            venue="At our residence"
             description="A day filled with laughter, colour and blessings as our families come together to celebrate the beginning of our wedding festivities."
           />
         </ScrollStackItem>
@@ -67,12 +63,12 @@ export default function WeddingCeremonies() {
         <ScrollStackItem>
           <CeremonyCard
             number="02"
+            tone="maroon"
             title="Nikah"
             subtitle="The sacred union"
-            icon="🤍"
-            date="27 December 2027"
-            time="12:00 PM"
-            venue="Your Nikah Venue"
+            date="27 December 2026"
+            time="03:00 PM"
+            venue="Rita Shree Banquet Hall"
             description="With the blessings of Allah and our loved ones around us, we come together to begin this beautiful journey as husband and wife."
           />
         </ScrollStackItem>
@@ -82,10 +78,9 @@ export default function WeddingCeremonies() {
             number="03"
             title="Reception"
             subtitle="An evening to remember"
-            icon="✨"
-            date="27 December 2027"
+            date="27 December 2026"
             time="7:00 PM"
-            venue="Your Reception Venue"
+            venue="Rita Shree Banquet Hall"
             description="An evening of food, laughter and celebration as we gather with the people who mean the most to us."
           />
         </ScrollStackItem>

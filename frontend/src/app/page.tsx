@@ -8,6 +8,7 @@ import WeddingOpening from "./components/WeddingOpening";
 import WeddingScratch from "./components/WeddingScratch";
 import WeddingCountdown from "./components/WeddingCountdown";
 import WeddingCeremonies from "./components/WeddingCeremonies";
+import WeddingVenue from "./components/WeddingVenue";
 
 export default function WeddingPage() {
   const [isOpened, setIsOpened] = useState(false);
@@ -93,6 +94,7 @@ export default function WeddingPage() {
       <WeddingScratch/>
       <WeddingCountdown/>
       <WeddingCeremonies/>
+      <WeddingVenue/>
 
       {/* Next sections */}
     </main>

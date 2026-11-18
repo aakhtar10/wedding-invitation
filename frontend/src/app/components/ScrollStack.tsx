@@ -1,11 +1,6 @@
 "use client";
 
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-} from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import "./ScrollStack.css";
 
@@ -19,317 +14,191 @@ export const ScrollStackItem: React.FC<ScrollStackItemProps> = ({
   itemClassName = "",
 }) => {
   return (
-    <div className={`scroll-stack-card ${itemClassName}`.trim()}>
-      {children}
-    </div>
+    <div className={`scroll-stack-card ${itemClassName}`.trim()}>{children}</div>
   );
 };
 
 interface ScrollStackProps {
   className?: string;
   children: ReactNode;
+  /** Gap between cards in px (shorter = less scrolling) */
   itemDistance?: number;
+  /** Scale step per card: deeper cards end up slightly smaller */
   itemScale?: number;
+  /** How many px of each card peeks out above the next one */
   itemStackDistance?: number;
-  stackPosition?: string;
-  scaleEndPosition?: string;
+  /** Where the first card pins. Prefer rem/px: "5rem". "%" also works */
+  stackPosition?: string | number;
   baseScale?: number;
   rotationAmount?: number;
   blurAmount?: number;
-  useWindowScroll?: boolean;
+  /** 0–1, how much a covered card darkens (adds depth) */
+  dimAmount?: number;
   onStackComplete?: () => void;
+}
+
+const clamp = (v: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, v));
+
+function toPx(value: string | number): number {
+  if (typeof value === "number") return value;
+  const v = value.trim();
+  const n = parseFloat(v);
+  if (v.endsWith("%")) return (n / 100) * window.innerHeight;
+  if (v.endsWith("rem")) {
+    return (
+      n * parseFloat(getComputedStyle(document.documentElement).fontSize)
+    );
+  }
+  return n;
 }
 
 const ScrollStack: React.FC<ScrollStackProps> = ({
   children,
   className = "",
-  itemDistance = 100,
+  itemDistance = 48,
   itemScale = 0.03,
-  itemStackDistance = 30,
-  stackPosition = "18%",
-  scaleEndPosition = "8%",
+  itemStackDistance = 22,
+  stackPosition = "5rem",
   baseScale = 0.9,
   rotationAmount = 0,
   blurAmount = 0,
+  dimAmount = 0.07,
   onStackComplete,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLElement[]>([]);
+  const pinStartsRef = useRef<number[]>([]);
   const rafRef = useRef<number | null>(null);
   const completedRef = useRef(false);
+  const reduceMotionRef = useRef(false);
+  const onCompleteRef = useRef(onStackComplete);
 
-  const parsePosition = useCallback(
-    (value: string | number) => {
-      const viewportHeight = window.innerHeight;
+  useEffect(() => {
+    onCompleteRef.current = onStackComplete;
+  });
 
-      if (
-        typeof value === "string" &&
-        value.includes("%")
-      ) {
-        return (
-          (parseFloat(value) / 100) *
-          viewportHeight
-        );
-      }
+  /**
+   * Work out the scrollY at which each card becomes pinned.
+   * Uses natural (unstuck) layout positions, so it stays correct
+   * while cards are stuck or scaled.
+   */
+  const measure = useCallback(() => {
+    const inner = innerRef.current;
+    const cards = cardsRef.current;
+    if (!inner || !cards.length) return;
 
-      return parseFloat(String(value));
-    },
-    []
-  );
+    const stackPx = toPx(stackPosition);
+    const innerTop = inner.getBoundingClientRect().top + window.scrollY;
+    let y = innerTop + (parseFloat(getComputedStyle(inner).paddingTop) || 0);
 
-  const updateCards = useCallback(() => {
-    if (!cardsRef.current.length) {
-      return;
-    }
+    pinStartsRef.current = cards.map((card, i) => {
+      const pinStart = y - stackPx - i * itemStackDistance;
+      y += card.offsetHeight + itemDistance;
+      return pinStart;
+    });
+  }, [itemDistance, itemStackDistance, stackPosition]);
+
+  const update = useCallback(() => {
+    const cards = cardsRef.current;
+    const pinStarts = pinStartsRef.current;
+    if (!cards.length || pinStarts.length !== cards.length) return;
 
     const scrollY = window.scrollY;
-    const viewportHeight = window.innerHeight;
 
-    const stackPositionPx =
-      parsePosition(stackPosition);
+    cards.forEach((card, i) => {
+      // A card shrinks while the NEXT card slides up over it
+      const nextPin = pinStarts[i + 1];
+      const progress =
+        nextPin === undefined || reduceMotionRef.current
+          ? 0
+          : clamp((scrollY - pinStarts[i]) / (nextPin - pinStarts[i]), 0, 1);
 
-    const scaleEndPositionPx =
-      parsePosition(scaleEndPosition);
+      const scale = 1 - (1 - (baseScale + i * itemScale)) * progress;
+      const rotate = rotationAmount * i * progress;
 
-    const container =
-      containerRef.current;
-
-    if (!container) return;
-
-    const containerTop =
-      container.getBoundingClientRect().top +
-      scrollY;
-
-    cardsRef.current.forEach((card, index) => {
-      const cardTop =
-        card.getBoundingClientRect().top +
-        scrollY;
-
-      const relativeScroll =
-        scrollY -
-        (cardTop -
-          stackPositionPx -
-          index * itemStackDistance);
-
-      const scaleDistance =
-        viewportHeight *
-        0.25;
-
-      const scaleProgress = Math.min(
-        1,
-        Math.max(
-          0,
-          relativeScroll /
-            scaleDistance
-        )
-      );
-
-      const targetScale =
-        1 -
-        (1 -
-          (baseScale +
-            index * itemScale)) *
-          scaleProgress;
-
-      const rotation =
-        rotationAmount *
-        index *
-        scaleProgress;
-
-      let blur = 0;
-
-      if (
-        blurAmount &&
-        relativeScroll > 0
-      ) {
-        blur =
-          Math.min(
-            index * blurAmount,
-            blurAmount * 3
-          );
+      const filters: string[] = [];
+      if (blurAmount && progress > 0.01) {
+        filters.push(`blur(${(blurAmount * progress).toFixed(2)}px)`);
+      }
+      if (dimAmount && progress > 0) {
+        filters.push(`brightness(${(1 - dimAmount * progress).toFixed(3)})`);
       }
 
-      /*
-       * Before reaching the stack:
-       * card stays normal.
-       *
-       * Once sticky takes over:
-       * only scale/rotation is changed.
-       */
-      if (relativeScroll <= 0) {
-        card.style.transform =
-          "translate3d(0, 0, 0) scale(1) rotate(0deg)";
-
-        card.style.filter = "none";
-
-        return;
-      }
-
-      /*
-       * Keep the card visually fixed.
-       *
-       * CSS sticky handles the actual
-       * position. JS only handles
-       * visual effects.
-       */
-      card.style.transform =
-        `translate3d(0, 0, 0) ` +
-        `scale(${targetScale}) ` +
-        `rotate(${rotation}deg)`;
-
-      card.style.filter =
-        blur > 0
-          ? `blur(${blur}px)`
-          : "none";
+      card.style.transform = `translate3d(0,0,0) scale(${scale}) rotate(${rotate}deg)`;
+      card.style.filter = filters.length ? filters.join(" ") : "none";
     });
 
-    /*
-     * Detect when the last card
-     * reaches the stack.
-     */
-    const lastCard =
-      cardsRef.current[
-        cardsRef.current.length - 1
-      ];
-
-    if (lastCard) {
-      const rect =
-        lastCard.getBoundingClientRect();
-
-      const isComplete =
-        rect.top <=
-        stackPositionPx;
-
-      if (
-        isComplete &&
-        !completedRef.current
-      ) {
-        completedRef.current = true;
-        onStackComplete?.();
-      }
-
-      if (
-        !isComplete &&
-        completedRef.current
-      ) {
-        completedRef.current = false;
-      }
+    const isComplete = scrollY >= pinStarts[pinStarts.length - 1];
+    if (isComplete && !completedRef.current) {
+      completedRef.current = true;
+      onCompleteRef.current?.();
+    } else if (!isComplete && completedRef.current) {
+      completedRef.current = false;
     }
-  }, [
-    baseScale,
-    blurAmount,
-    itemScale,
-    itemStackDistance,
-    onStackComplete,
-    parsePosition,
-    rotationAmount,
-    scaleEndPosition,
-    stackPosition,
-  ]);
+  }, [baseScale, blurAmount, dimAmount, itemScale, rotationAmount]);
 
   const requestUpdate = useCallback(() => {
-    if (rafRef.current !== null) {
-      return;
-    }
-
-    rafRef.current =
-      requestAnimationFrame(() => {
-        rafRef.current = null;
-        updateCards();
-      });
-  }, [updateCards]);
+    if (rafRef.current !== null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      update();
+    });
+  }, [update]);
 
   useLayoutEffect(() => {
-    const container =
-      containerRef.current;
-
-    if (!container) return;
+    const container = containerRef.current;
+    const inner = innerRef.current;
+    if (!container || !inner) return;
 
     const cards = Array.from(
-      container.querySelectorAll(
-        ".scroll-stack-card"
-      )
-    ) as HTMLElement[];
-
+      container.querySelectorAll<HTMLElement>(".scroll-stack-card")
+    );
     cardsRef.current = cards;
 
-    cards.forEach((card, index) => {
-      /*
-       * Space between cards.
-       */
-      if (
-        index <
-        cards.length - 1
-      ) {
-        card.style.marginBottom =
-          `${itemDistance}px`;
-      }
+    reduceMotionRef.current = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
 
-      /*
-       * Sticky positioning.
-       */
-      card.style.position =
-        "sticky";
+    const topBase =
+      typeof stackPosition === "number" ? `${stackPosition}px` : stackPosition;
 
-      card.style.top =
-        `calc(${stackPosition} + ${index * itemStackDistance}px)`;
-
-      /*
-       * GPU optimization.
-       */
-      card.style.willChange =
-        "transform";
-
-      card.style.transformOrigin =
-        "top center";
-
-      card.style.backfaceVisibility =
-        "hidden";
-
-      card.style.webkitBackfaceVisibility =
-        "hidden";
-
-      card.style.zIndex =
-        String(index + 1);
+    cards.forEach((card, i) => {
+      card.style.marginBottom =
+        i < cards.length - 1 ? `${itemDistance}px` : "";
+      card.style.position = "sticky";
+      card.style.top = `calc(${topBase} + ${i * itemStackDistance}px)`;
+      card.style.zIndex = String(i + 1);
+      card.style.transformOrigin = "top center";
+      card.style.willChange = "transform";
     });
 
-    requestAnimationFrame(
-      updateCards
-    );
-
-    const handleResize = () => {
-      requestUpdate();
+    let cancelled = false;
+    const refresh = () => {
+      if (cancelled) return;
+      measure();
+      update();
     };
 
-    window.addEventListener(
-      "resize",
-      handleResize
-    );
+    refresh();
 
-    window.addEventListener(
-      "scroll",
-      requestUpdate,
-      { passive: true }
-    );
+    // Re-measure when fonts load or card content changes height
+    document.fonts?.ready.then(refresh);
+    const ro = new ResizeObserver(refresh);
+    ro.observe(inner);
+
+    window.addEventListener("resize", refresh);
+    window.addEventListener("scroll", requestUpdate, { passive: true });
 
     return () => {
-      window.removeEventListener(
-        "resize",
-        handleResize
-      );
+      cancelled = true;
+      ro.disconnect();
+      window.removeEventListener("resize", refresh);
+      window.removeEventListener("scroll", requestUpdate);
 
-      window.removeEventListener(
-        "scroll",
-        requestUpdate
-      );
-
-      if (
-        rafRef.current !== null
-      ) {
-        cancelAnimationFrame(
-          rafRef.current
-        );
-
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
 
@@ -338,20 +207,23 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
         card.style.top = "";
         card.style.zIndex = "";
         card.style.transform = "";
+        card.style.transformOrigin = "";
         card.style.filter = "";
         card.style.marginBottom = "";
         card.style.willChange = "";
       });
 
       cardsRef.current = [];
+      pinStartsRef.current = [];
       completedRef.current = false;
     };
   }, [
     itemDistance,
     itemStackDistance,
-    requestUpdate,
     stackPosition,
-    updateCards,
+    measure,
+    update,
+    requestUpdate,
   ]);
 
   return (
@@ -359,9 +231,8 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       ref={containerRef}
       className={`scroll-stack-scroller ${className}`.trim()}
     >
-      <div className="scroll-stack-inner">
+      <div ref={innerRef} className="scroll-stack-inner">
         {children}
-
         <div className="scroll-stack-end" />
       </div>
     </div>
