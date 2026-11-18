@@ -10,6 +10,7 @@ import WeddingCountdown from "./components/WeddingCountdown";
 import WeddingCeremonies from "./components/WeddingCeremonies";
 import WeddingVenue from "./components/WeddingVenue";
 import WeddingClosing from "./components/WeddingClosing";
+import WeddingMusic from "./components/WeddingMusic";
 
 export default function WeddingPage() {
   const [isOpened, setIsOpened] = useState(false);
@@ -109,6 +110,8 @@ export default function WeddingPage() {
       <WeddingCeremonies />
       <WeddingVenue />
       <WeddingClosing />
+        <WeddingMusic isOpened={isOpened} />
+
     </main>
   );
 }
