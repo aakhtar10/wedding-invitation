@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -13,66 +14,99 @@ export default function WeddingScratch() {
   const rafRef = useRef<number | null>(null);
 
   const [revealed, setRevealed] = useState(false);
+
   const isDrawing = useRef(false);
   const lastPoint = useRef({ x: 0, y: 0 });
   const hasRevealed = useRef(false);
 
   /* ---------- Scratch surface setup ---------- */
+
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = canvas?.parentElement;
 
-    const container = canvas.parentElement;
-    if (!container) return;
+    if (!canvas || !container) return;
 
-    const rect = container.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
+    const setupCanvas = () => {
+      // Do not reset the scratch surface after it has been revealed.
+      if (hasRevealed.current) return;
 
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `${rect.height}px`;
+      const rect = container.getBoundingClientRect();
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+      if (!rect.width || !rect.height) return;
 
-    ctx.scale(dpr, dpr);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    // Scratch surface
-    ctx.fillStyle = "#c9a96e";
-    ctx.fillRect(0, 0, rect.width, rect.height);
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
 
-    // Subtle texture
-    ctx.globalAlpha = 0.12;
-    for (let i = 0; i < 400; i++) {
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = 1;
+
+      // Scratch surface
+      ctx.fillStyle = "#c9a96e";
+      ctx.fillRect(0, 0, rect.width, rect.height);
+
+      // Subtle texture
+      ctx.globalAlpha = 0.12;
+
+      for (let i = 0; i < 400; i++) {
+        ctx.fillStyle = "#fffdf8";
+        ctx.beginPath();
+
+        ctx.arc(
+          Math.random() * rect.width,
+          Math.random() * rect.height,
+          Math.random() * 1.5,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.fill();
+      }
+
+      ctx.globalAlpha = 1;
+
+      // Instruction text
       ctx.fillStyle = "#fffdf8";
-      ctx.beginPath();
-      ctx.arc(
-        Math.random() * rect.width,
-        Math.random() * rect.height,
-        Math.random() * 1.5,
-        0,
-        Math.PI * 2
-      );
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = '500 11px "Montserrat", sans-serif';
+      ctx.letterSpacing = "2px";
 
-    // Instruction text
-    ctx.fillStyle = "#fffdf8";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.font = '500 11px "Montserrat", sans-serif';
-    ctx.letterSpacing = "2px";
-    ctx.fillText("SCRATCH TO REVEAL", rect.width / 2, rect.height / 2);
+      ctx.fillText(
+        "SCRATCH TO REVEAL",
+        rect.width / 2,
+        rect.height / 2
+      );
+    };
+
+    setupCanvas();
+
+    const observer = new ResizeObserver(() => {
+      setupCanvas();
+    });
+
+    observer.observe(container);
+
+    return () => observer.disconnect();
   }, []);
 
   /* ---------- Celebration ---------- */
+
   const celebrate = useCallback(async () => {
     const { default: confetti } = await import("canvas-confetti");
 
-    // Origin of the card, as a 0–1 fraction of the viewport
     const cardRect = cardRef.current?.getBoundingClientRect();
+
     const origin = cardRect
       ? {
           x: (cardRect.left + cardRect.width / 2) / window.innerWidth,
@@ -80,15 +114,16 @@ export default function WeddingScratch() {
         }
       : { x: 0.5, y: 0.5 };
 
-    // Petal shape (colourable) + flower emoji shapes
     const petal = confetti.shapeFromPath({
       path: "M0 0 C0 -14 14 -14 14 0 C14 14 0 14 0 0 Z",
     });
-    
 
-    const base = { disableForReducedMotion: true, zIndex: 100 };
+    const base = {
+      disableForReducedMotion: true,
+      zIndex: 100,
+    };
 
-    // 1) Burst from the card
+    // 1. Burst from the card
     confetti({
       ...base,
       particleCount: 60,
@@ -100,6 +135,7 @@ export default function WeddingScratch() {
       shapes: ["star", "circle"],
       scalar: 0.9,
     });
+
     confetti({
       ...base,
       particleCount: 24,
@@ -113,7 +149,7 @@ export default function WeddingScratch() {
       scalar: 1.6,
     });
 
-    // 2) Twin cannons from the lower corners
+    // 2. Twin cannons from lower corners
     const cannon = (x: number, angle: number) =>
       confetti({
         ...base,
@@ -134,7 +170,7 @@ export default function WeddingScratch() {
       cannon(1, 120);
     }, 350);
 
-    // 3) Gentle falling petals from the top for a few seconds
+    // 3. Gentle falling petals
     const end = Date.now() + 5000;
     let lastDrop = 0;
 
@@ -143,6 +179,7 @@ export default function WeddingScratch() {
 
       if (now - lastDrop > 140) {
         lastDrop = now;
+
         confetti({
           ...base,
           particleCount: 2,
@@ -154,79 +191,129 @@ export default function WeddingScratch() {
           ticks: 520,
           origin: { x: Math.random(), y: -0.05 },
           colors: BLUSH,
-          shapes: [petal,],
+          shapes: [petal],
           scalar: 1.4 + Math.random() * 0.6,
         });
       }
+
       rafRef.current = requestAnimationFrame(rain);
     };
+
     rafRef.current = requestAnimationFrame(rain);
   }, []);
 
-  // Stop any running animation on unmount
+  /* ---------- Cleanup ---------- */
+
   useEffect(() => {
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      import("canvas-confetti").then(({ default: confetti }) =>
-        confetti.reset()
-      );
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+
+      import("canvas-confetti").then(({ default: confetti }) => {
+        confetti.reset();
+      });
     };
   }, []);
 
   /* ---------- Scratch handling ---------- */
-  const getPoint = (event: React.PointerEvent<HTMLCanvasElement>) => {
+
+  const getPoint = (
+    event: React.PointerEvent<HTMLCanvasElement>
+  ) => {
     const canvas = canvasRef.current;
+
     if (!canvas) return { x: 0, y: 0 };
+
     const rect = canvas.getBoundingClientRect();
-    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
   };
 
-  const scratch = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDrawing.current) return;
+  const startScratch = (
+    event: React.PointerEvent<HTMLCanvasElement>
+  ) => {
+    if (hasRevealed.current) return;
+
+    event.preventDefault();
+
+    isDrawing.current = true;
+    lastPoint.current = getPoint(event);
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const scratch = (
+    event: React.PointerEvent<HTMLCanvasElement>
+  ) => {
+    if (!isDrawing.current || hasRevealed.current) return;
+
+    event.preventDefault();
 
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
+
     if (!canvas || !ctx) return;
 
     const point = getPoint(event);
 
     ctx.globalCompositeOperation = "destination-out";
     ctx.beginPath();
+
     ctx.moveTo(lastPoint.current.x, lastPoint.current.y);
     ctx.lineTo(point.x, point.y);
+
     ctx.lineWidth = 32;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+
     ctx.stroke();
 
     lastPoint.current = point;
   };
 
-  const startScratch = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    isDrawing.current = true;
-    lastPoint.current = getPoint(event);
-    event.currentTarget.setPointerCapture(event.pointerId);
+  const stopScratch = (
+    event?: React.PointerEvent<HTMLCanvasElement>
+  ) => {
+    isDrawing.current = false;
+
+    if (
+      event &&
+      event.currentTarget.hasPointerCapture(event.pointerId)
+    ) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
   };
 
-  const stopScratch = () => {
-    isDrawing.current = false;
-  };
+  /* ---------- Reveal detection ---------- */
 
   const handleScratchEnd = () => {
     if (hasRevealed.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
+
     if (!canvas || !ctx) return;
 
-    const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const { data } = ctx.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
 
     let transparent = 0;
+
     for (let i = 3; i < data.length; i += 4) {
       if (data[i] === 0) transparent++;
     }
 
-    if (transparent / (data.length / 4) > 0.3) {
+    const percentage = transparent / (data.length / 4);
+
+    if (percentage > 0.3) {
       hasRevealed.current = true;
       setRevealed(true);
       celebrate();
@@ -269,6 +356,7 @@ export default function WeddingScratch() {
           {revealed ? "Our Forever Begins" : "Scratch to Reveal"}
         </motion.h2>
 
+        {/* DESCRIPTION */}
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -288,7 +376,7 @@ export default function WeddingScratch() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative mx-auto mt-10 aspect-[1.7/1] w-full max-w-sm rounded-2xl border border-wedding-gold/40 bg-wedding-surface shadow-xl"
+          className="relative mx-auto mt-10 aspect-[1.7/1] w-full max-w-sm overflow-hidden rounded-2xl border border-wedding-gold/40 bg-wedding-surface shadow-xl"
         >
           {/* REVEALED CONTENT */}
           <motion.div
@@ -300,7 +388,9 @@ export default function WeddingScratch() {
             transition={{ duration: 0.9, ease: "easeOut" }}
             className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center"
           >
-            <p className="wedding-eyebrow mb-3">Save the date</p>
+            <p className="wedding-eyebrow mb-3">
+              Save the date
+            </p>
 
             <h3 className="font-allura text-5xl leading-none text-wedding-text">
               27 December
@@ -311,31 +401,32 @@ export default function WeddingScratch() {
             </p>
           </motion.div>
 
-          {/* SCRATCH LAYER (fades out instead of vanishing) */}
+          {/* SCRATCH LAYER */}
           <canvas
             ref={canvasRef}
             onPointerDown={startScratch}
             onPointerMove={scratch}
             onPointerUp={(event) => {
-              stopScratch();
+              stopScratch(event);
               handleScratchEnd();
-              if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-                event.currentTarget.releasePointerCapture(event.pointerId);
-              }
             }}
             onPointerCancel={stopScratch}
-            className={`absolute inset-0 h-full w-full touch-none rounded-2xl transition-opacity duration-700 ${
+            onLostPointerCapture={() => {
+              isDrawing.current = false;
+            }}
+            className={`absolute inset-0 z-10 h-full w-full touch-none select-none rounded-2xl transition-opacity duration-700 ${
               revealed
                 ? "pointer-events-none opacity-0"
                 : "cursor-pointer opacity-100"
             }`}
           />
 
-          {/* DECORATIVE FRAME — always visible */}
+          {/* DECORATIVE FRAME */}
           <Image
             src="/wedding/scratch-frame.webp"
             alt=""
             fill
+            sizes="(max-width: 448px) calc(100vw - 48px), 384px"
             className="pointer-events-none absolute inset-0 z-20 scale-[1.09] select-none object-cover"
             priority
           />
@@ -346,7 +437,7 @@ export default function WeddingScratch() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
-              className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-wedding-gold/30"
+              className="pointer-events-none absolute inset-0 z-30 rounded-2xl ring-1 ring-wedding-gold/30"
             />
           )}
         </motion.div>

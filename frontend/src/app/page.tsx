@@ -40,7 +40,7 @@ export default function WeddingPage() {
               fixed
               inset-0
               z-50
-              h-[110vh]
+              h-[100dvh]
               w-full
               cursor-pointer
               overscroll-none
