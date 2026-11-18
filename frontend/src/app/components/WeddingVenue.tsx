@@ -3,6 +3,7 @@
 import { motion, MotionConfig } from "framer-motion";
 import { ExternalLink, MapPin, Navigation } from "lucide-react";
 import { Italiana } from "next/font/google";
+import Image from "next/image";
 
 const display = Italiana({ subsets: ["latin"], weight: "400" });
 
@@ -38,16 +39,23 @@ const fadeUp = {
 export default function WeddingVenue() {
   return (
     <MotionConfig reducedMotion="user">
-      <section className="relative overflow-hidden bg-wedding-secondary px-6 py-24">
-        {/* soft glow behind the card */}
+      {/* relative + z-10, no overflow-hidden: the divider hangs below this
+          section and must paint above the next one */}
+      <section className="relative z-10 bg-wedding-secondary px-6 py-24">
+        {/* soft glow behind the card (clipped in its own box so it can
+            never cause sideways scrolling) */}
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-1/3 h-96 w-96 -translate-x-1/2 rounded-full blur-3xl"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(244,199,195,0.5), transparent 70%)",
-          }}
-        />
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+        >
+          <div
+            className="absolute left-1/2 top-1/3 h-96 w-96 -translate-x-1/2 rounded-full blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(244,199,195,0.5), transparent 70%)",
+            }}
+          />
+        </div>
 
         <motion.div
           initial="hidden"
@@ -207,6 +215,15 @@ export default function WeddingVenue() {
             ✦ Directions open in your maps app ✦
           </motion.p>
         </motion.div>
+
+        {/* BOTTOM FLORAL DIVIDER */}
+        <Image
+          src="/wedding/floral-divider.webp"
+          alt=""
+          width={1000}
+          height={60}
+          className="pointer-events-none absolute -bottom-2 left-1/2 z-20 w-full max-w-4xl -translate-x-1/2 translate-y-1/2 select-none object-cover"
+        />
       </section>
     </MotionConfig>
   );

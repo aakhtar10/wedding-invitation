@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import ScrollStack, { ScrollStackItem } from "./ScrollStack";
 import CeremonyCard from "./CeremonyCard";
+import Image from "next/image";
 
 export default function WeddingCeremonies() {
   return (
@@ -85,6 +86,15 @@ export default function WeddingCeremonies() {
           />
         </ScrollStackItem>
       </ScrollStack>
+
+      {/* BOTTOM FLORAL DIVIDER (z-20 so it paints above the Venue section) */}
+      <Image
+        src="/wedding/floral-divider.webp"
+        alt=""
+        width={1000}
+        height={60}
+        className="pointer-events-none absolute -bottom-2 left-1/2 z-20 w-full max-w-4xl -translate-x-1/2 translate-y-1/2 select-none object-cover"
+      />
     </section>
   );
 }

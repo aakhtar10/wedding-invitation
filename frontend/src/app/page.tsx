@@ -2,18 +2,31 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import {  useState } from "react";
+import { useEffect, useState } from "react";
 import WeddingHero from "./components/WeddingHero";
 import WeddingOpening from "./components/WeddingOpening";
 import WeddingScratch from "./components/WeddingScratch";
 import WeddingCountdown from "./components/WeddingCountdown";
 import WeddingCeremonies from "./components/WeddingCeremonies";
 import WeddingVenue from "./components/WeddingVenue";
+import WeddingClosing from "./components/WeddingClosing";
 
 export default function WeddingPage() {
   const [isOpened, setIsOpened] = useState(false);
 
-  
+  // Lock page scroll until the invitation is opened, then start from the top
+  useEffect(() => {
+    if (isOpened) {
+      document.body.style.overflow = "";
+      window.scrollTo(0, 0);
+    } else {
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpened]);
 
   return (
     <main className="flex flex-col">
@@ -91,12 +104,11 @@ export default function WeddingPage() {
 
       {/* HERO */}
       <WeddingHero />
-      <WeddingScratch/>
-      <WeddingCountdown/>
-      <WeddingCeremonies/>
-      <WeddingVenue/>
-
-      {/* Next sections */}
+      <WeddingScratch />
+      <WeddingCountdown />
+      <WeddingCeremonies />
+      <WeddingVenue />
+      <WeddingClosing />
     </main>
   );
 }
