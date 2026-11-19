@@ -48,6 +48,11 @@ export default function WeddingOpening({ isOpened }: WeddingOpeningProps) {
     <section className="relative h-[110vh] w-full overflow-hidden bg-wedding-primary">
       {/* VIDEO (poster = same image as the opening cover, so the fade is seamless) */}
     <video
+    style={{
+  transform: "translateZ(0)",
+  backfaceVisibility: "hidden",
+  WebkitBackfaceVisibility: "hidden",
+}}
   ref={videoRef}
   src="/wedding/opening.mp4"
   muted
