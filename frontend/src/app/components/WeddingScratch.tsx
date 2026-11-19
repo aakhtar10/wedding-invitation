@@ -397,7 +397,7 @@ export default function WeddingScratch() {
             </h3>
 
             <p className="mt-1 font-body text-sm tracking-[0.35em] text-wedding-gold-dark">
-              2027
+              2026
             </p>
           </motion.div>
 

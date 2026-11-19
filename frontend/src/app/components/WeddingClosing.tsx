@@ -177,29 +177,7 @@ const pillClass =
 /* ---------- Component ---------- */
 
 export default function WeddingClosing() {
-  const [daysLeft, setDaysLeft] = useState<number | null>(null);
 
-  useEffect(() => {
-    const updateCountdown = () => {
-      const diff =
-        new Date(WEDDING_START).getTime() - Date.now();
-
-      setDaysLeft(
-        diff > 0
-          ? Math.ceil(diff / 86_400_000)
-          : null
-      );
-    };
-
-    updateCountdown();
-
-    const interval = window.setInterval(
-      updateCountdown,
-      60_000
-    );
-
-    return () => window.clearInterval(interval);
-  }, []);
 
   return (
     <MotionConfig reducedMotion="user">
@@ -364,16 +342,7 @@ export default function WeddingClosing() {
               more to us than any gift could.
             </p>
 
-            {/* COUNTDOWN */}
 
-            <p className="wedding-caption mt-5 min-h-5">
-              {daysLeft !== null && (
-                <>
-                  ✦ {daysLeft}{" "}
-                  {daysLeft === 1 ? "day" : "days"} to go ✦
-                </>
-              )}
-            </p>
 
             <p className="mt-8 font-body text-[0.65rem] uppercase tracking-[0.4em] text-wedding-text/60">
               With love &amp; duas
