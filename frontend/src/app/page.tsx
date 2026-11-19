@@ -14,18 +14,48 @@ import WeddingVenue from "./components/WeddingVenue";
 import WeddingClosing from "./components/WeddingClosing";
 import WeddingMusic from "./components/WeddingMusic";
 
+function OpeningOverlay({ onOpen }: { onOpen: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-[9999] h-[100dvh] w-full cursor-pointer overscroll-none touch-none"
+      onClick={onOpen}
+      role="button"
+      aria-label="Open wedding invitation"
+    >
+      <Image
+        src="/wedding/opening.webp"
+        alt="Wedding invitation"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover"
+      />
+
+      <motion.div
+        className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/10 backdrop-blur-sm"
+        animate={{ scale: [1, 1.12, 1] }}
+        transition={{
+          duration: 1.5,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        <span className="text-[10px] tracking-[0.2em] text-white">
+          OPEN
+        </span>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function WeddingPage() {
   const [isOpened, setIsOpened] = useState(false);
-
-  const handleOpen = () => {
-    setIsOpened(true);
-  };
 
   useEffect(() => {
     document.body.style.overflow = isOpened ? "" : "hidden";
 
     if (isOpened) {
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, behavior: "instant" });
     }
 
     return () => {
@@ -36,33 +66,7 @@ export default function WeddingPage() {
   return (
     <main className="flex flex-col">
       {!isOpened && (
-        <div
-          className="fixed inset-0 z-50 h-[100dvh] w-full cursor-pointer overscroll-none touch-none"
-          onClick={handleOpen}
-        >
-          <Image
-            src="/wedding/opening.webp"
-            alt="Wedding invitation"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-
-          <motion.div
-            className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/10 backdrop-blur-sm"
-            animate={{ scale: [1, 1.12, 1] }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          >
-            <span className="text-[10px] tracking-[0.2em] text-white">
-              OPEN
-            </span>
-          </motion.div>
-        </div>
+        <OpeningOverlay onOpen={() => setIsOpened(true)} />
       )}
 
       <WeddingOpening isOpened={isOpened} />

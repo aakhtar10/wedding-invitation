@@ -50,7 +50,6 @@ export default function WeddingOpening({ isOpened }: WeddingOpeningProps) {
       <video
         ref={videoRef}
         src="/wedding/opening.mp4"
-        poster="/wedding/opening.webp"
         muted
         playsInline
         preload="auto"
