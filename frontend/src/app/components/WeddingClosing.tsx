@@ -6,7 +6,7 @@ import Image from "next/image";
 
 /* ---------- Configuration ---------- */
 
-const COUPLE = "Maria & Arsalan";
+const COUPLE = "Arsalan & Maria";
 const RED = "#5a1827";
 
 /* ---------- Animations ---------- */

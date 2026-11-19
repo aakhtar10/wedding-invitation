@@ -85,6 +85,19 @@ export default function WeddingCeremonies() {
             description="An evening of food, laughter and celebration as we gather with the people who mean the most to us."
           />
         </ScrollStackItem>
+
+        <ScrollStackItem>
+  <CeremonyCard
+    number="04"
+    tone="ivory"
+    title="Dinner"
+    subtitle="A feast with loved ones"
+    date="27 December 2026"
+    time="08:00 PM"
+    venue="Rita Shree Banquet Hall"
+    description="Join us for a delightful dinner as we share good food, warm conversations and beautiful memories with our family and friends."
+  />
+</ScrollStackItem>
       </ScrollStack>
 
       {/* BOTTOM FLORAL DIVIDER (z-20 so it paints above the Venue section) */}

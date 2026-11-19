@@ -46,7 +46,7 @@ export default function WeddingHero() {
 
     <div className="mt-10">
       <h1 className="wedding-names">
-        Maria
+      Arsalan
       </h1>
 
       <span className="wedding-names mx-4">
@@ -54,7 +54,7 @@ export default function WeddingHero() {
       </span>
 
       <h1 className="wedding-names">
-        Arsalan
+          Maria 
       </h1>
     </div>
 

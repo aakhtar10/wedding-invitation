@@ -1,16 +1,71 @@
-
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface WeddingOpeningProps {
   isOpened: boolean;
 }
 
-export default function WeddingOpening({
-  isOpened,
-}: WeddingOpeningProps) {
+// If the video never reaches "ended" (autoplay blocked, slow network, decode
+// error) the invitation text would stay hidden forever. Reveal it anyway.
+const REVEAL_FALLBACK_MS = 20000;
+
+/**
+ * A name that is "written" left to right. The clip-path overshoots the box
+ * slightly so Allura's swashes and descenders are never cut off.
+ */
+function WrittenName({
+  children,
+  delay,
+  reduce,
+}: {
+  children: string;
+  delay: number;
+  reduce: boolean;
+}) {
+  return (
+    <div aria-hidden="true" className="wedding-script-name">
+      <motion.span
+        className="inline-block"
+        initial={
+          reduce ? false : { clipPath: "inset(-30% 100% -30% -6%)" }
+        }
+        animate={{ clipPath: "inset(-30% -6% -30% -6%)" }}
+        transition={{ delay, duration: 1.7, ease: [0.45, 0, 0.2, 1] }}
+      >
+        {children}
+      </motion.span>
+    </div>
+  );
+}
+
+function Fade({
+  children,
+  delay,
+  reduce,
+  className,
+}: {
+  children: React.ReactNode;
+  delay: number;
+  reduce: boolean;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      className={className}
+      initial={reduce ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay, duration: 0.9, ease: "easeOut" }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+export default function WeddingOpening({ isOpened }: WeddingOpeningProps) {
+  const reduce = useReducedMotion() ?? false;
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hasStarted = useRef(false);
@@ -18,9 +73,10 @@ export default function WeddingOpening({
   const [videoEnded, setVideoEnded] = useState(false);
   const [finalFrame, setFinalFrame] = useState<string | null>(null);
 
+  const reveal = useCallback(() => setVideoEnded(true), []);
+
   useEffect(() => {
     const video = videoRef.current;
-
     if (!video || !isOpened || hasStarted.current) return;
 
     hasStarted.current = true;
@@ -31,32 +87,26 @@ export default function WeddingOpening({
 
     video.play().catch((error) => {
       console.error("Wedding video failed to play:", error);
+      reveal();
     });
-  }, [isOpened]);
+
+    const timer = window.setTimeout(reveal, REVEAL_FALLBACK_MS);
+    return () => window.clearTimeout(timer);
+  }, [isOpened, reveal]);
 
   const handleVideoEnd = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
-    if (!video || !canvas) return;
+    video?.pause();
 
-    video.pause();
-
-    if (video.videoWidth && video.videoHeight) {
+    if (video && canvas && video.videoWidth && video.videoHeight) {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
       const context = canvas.getContext("2d");
-
       if (context) {
-        context.drawImage(
-          video,
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
-
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
         try {
           setFinalFrame(canvas.toDataURL("image/webp", 0.95));
         } catch (error) {
@@ -65,12 +115,11 @@ export default function WeddingOpening({
       }
     }
 
-    setVideoEnded(true);
+    reveal();
   };
 
   return (
     <section className="relative h-[110vh] w-full overflow-hidden bg-wedding-primary">
-
       {/* VIDEO */}
       <video
         ref={videoRef}
@@ -79,6 +128,7 @@ export default function WeddingOpening({
         playsInline
         preload="auto"
         onEnded={handleVideoEnd}
+        onError={reveal}
         style={{
           transform: "translateZ(0)",
           backfaceVisibility: "hidden",
@@ -89,6 +139,7 @@ export default function WeddingOpening({
 
       {/* PERMANENT FINAL VIDEO FRAME */}
       {finalFrame && (
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={finalFrame}
           alt=""
@@ -98,151 +149,111 @@ export default function WeddingOpening({
         />
       )}
 
-      <canvas
-        ref={canvasRef}
-        className="hidden"
-        aria-hidden="true"
-      />
+      <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
 
-      {/* WEDDING CONTENT */}
-      <AnimatePresence>
-        {videoEnded && (
-          <motion.div
-            className="absolute inset-0 z-10 flex items-center justify-center px-5 py-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 1,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="relative w-full max-w-md px-7 py-10 text-center"
-            >
-              {/* BISMILLAH */}
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1 }}
-                className="relative z-10 mb-3"
-              >
-                <p dir="rtl" className="wedding-arabic">
-                  ﷽
-                </p>
-              </motion.div>
+      {/* SOFT WASH so the text stays readable over any frame of the video */}
+      {videoEnded && (
+        <motion.div
+          aria-hidden="true"
+          className="wedding-wash pointer-events-none absolute inset-0 z-[2]"
+          initial={reduce ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.2 }}
+        />
+      )}
 
-              {/* TRANSLATION */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
-                className="wedding-caption mb-7"
-              >
-                In the name of Allah, the Most Gracious,
-                <br />
-                the Most Merciful
-              </motion.p>
+      {/* INVITATION */}
+      {videoEnded && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center px-5 py-8">
+          <div className="w-full max-w-md text-center">
+            <h1 className="sr-only">
+              Arsalan Akhtar and Maria Bin-tul Islam are getting married
+            </h1>
 
-              {/* INTRO */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6, duration: 0.8 }}
-                className="wedding-eyebrow mb-4"
-              >
-                Together with their families
-              </motion.p>
+            {/* Bismillah + translation */}
+            <Fade delay={0} reduce={reduce}>
+              <p dir="rtl" lang="ar" className="wedding-bismillah">
+                ﷽
+              </p>
+              <p className="wedding-lede wedding-lede--small mt-1">
+                In the name of Allah, the Most Gracious, the Most Merciful
+              </p>
+            </Fade>
 
-              {/* GROOM */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9, duration: 0.9 }}
-              >
-                <h1 className="wedding-names text-wedding-gold-light">
-                  Arsalan Akhtar
-                </h1>
+            <Fade delay={0.8} reduce={reduce} className="mt-10">
+              <p className="wedding-lede">Together with their families</p>
+            </Fade>
 
-                <p className="wedding-caption mt-2">
+            {/* Groom: the name is written, then his parents appear */}
+            <div className="mt-3">
+              <WrittenName delay={1.2} reduce={reduce}>
+                Arsalan Akhtar
+              </WrittenName>
+              <Fade delay={2.4} reduce={reduce}>
+                <p className="wedding-parents">
                   Son of Md Sohail Akhtar &amp; Gazala Perween
                 </p>
-              </motion.div>
+              </Fade>
+            </div>
 
-              {/* AMPERSAND */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.7 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.2, duration: 0.7 }}
-                className="my-3 wedding-names"
-              >
-                &amp;
-              </motion.div>
+            {/* The ampersand sits between the two families, so it carries
+                hairlines that join them */}
+            <Fade
+              delay={2.5}
+              reduce={reduce}
+              className="my-5 flex items-center justify-center gap-4"
+            >
+              <span className="h-px w-14 bg-wedding-gold/60" />
+              <span className="wedding-amp">&amp;</span>
+              <span className="h-px w-14 bg-wedding-gold/60" />
+            </Fade>
 
-              {/* BRIDE */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.4, duration: 0.9 }}
-              >
-                <h1 className="wedding-names text-wedding-gold-light">
-                  Maria Bin-tul Islam
-                </h1>
-
-                <p className="wedding-caption mt-2">
+            {/* Bride */}
+            <div>
+              <WrittenName delay={2.8} reduce={reduce}>
+                Maria Bin-tul Islam
+              </WrittenName>
+              <Fade delay={4.0} reduce={reduce}>
+                <p className="wedding-parents">
                   Daughter of Md Khaliq &amp; Shabnam Perween
                 </p>
-              </motion.div>
+              </Fade>
+            </div>
 
-              {/* ORNAMENT */}
-              <motion.div
-                initial={{ opacity: 0, scaleX: 0 }}
-                animate={{ opacity: 1, scaleX: 1 }}
-                transition={{ delay: 1.8, duration: 0.8 }}
-                className="mx-auto mt-6 flex items-center justify-center gap-2"
-              >
-                <span className="h-px w-10 bg-wedding-gold/60" />
-                <span className="h-1.5 w-1.5 rotate-45 bg-wedding-gold" />
-                <span className="h-px w-10 bg-wedding-gold/60" />
-              </motion.div>
+            {/* Scroll cue: a line that draws downward, no text needed */}
+         {/* Scroll cue */}
+<Fade
+  delay={4.8}
+  reduce={reduce}
+  className="mt-10 flex flex-col items-center gap-3"
+>
+  <div className="relative h-10 w-px overflow-hidden bg-wedding-gold/30">
+    <motion.span
+      className="absolute inset-x-0 top-0 h-5 bg-wedding-gold-dark"
+      animate={reduce ? undefined : { y: [-20, 40] }}
+      transition={{
+        duration: 1.8,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+    />
+  </div>
 
-              {/* SCROLL INDICATOR */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 2.3, duration: 0.8 }}
-                className="mt-8 flex flex-col items-center gap-2"
-              >
-                <span className="text-[9px] uppercase tracking-[0.3em] text-wedding-gold-light/80">
-                  Scroll to explore
-                </span>
-
-                <motion.div
-                  animate={{ y: [0, 6, 0] }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="flex h-8 w-5 items-start justify-center rounded-full border border-wedding-gold/50 p-1"
-                >
-                  <motion.span
-                    animate={{ y: [0, 10, 0], opacity: [1, 0.3, 1] }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    className="h-1.5 w-1 rounded-full bg-wedding-gold"
-                  />
-                </motion.div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  <motion.p
+    className="wedding-eyebrow text-[0.58rem] tracking-[0.3em]"
+    animate={reduce ? undefined : { opacity: [0.5, 1, 0.5] }}
+    transition={{
+      duration: 2.4,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }}
+  >
+    SCROLL TO EXPLORE
+  </motion.p>
+</Fade>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

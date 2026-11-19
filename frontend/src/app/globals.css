@@ -121,3 +121,66 @@
   line-height: 1.8;
   font-style: italic;
 }
+
+/* ================================
+   WEDDING OPENING
+   Append to globals.css. New class names only, so the other
+   sections that use .wedding-names / .wedding-eyebrow are untouched.
+================================ */
+
+/* Ivory glow behind the text; keeps contrast over any video frame */
+.wedding-wash {
+  background: radial-gradient(
+    ellipse 75% 62% at 50% 50%,
+    color-mix(in srgb, var(--color-wedding-primary) 80%, transparent) 0%,
+    color-mix(in srgb, var(--color-wedding-primary) 45%, transparent) 55%,
+    transparent 100%
+  );
+}
+
+/* Add an Arabic face for a proper ﷽ glyph, e.g. next/font Amiri exposed
+   as --font-arabic. The fallbacks work if you skip that. */
+.wedding-bismillah {
+  font-family: var(--font-arabic, "Amiri", "Scheherazade New", serif);
+  font-size: clamp(2.4rem, 9vw, 3.4rem);
+  line-height: 1.4;
+  color: var(--color-wedding-gold-dark);
+}
+
+/* Sentence-case serif italic for the quiet lines */
+.wedding-lede {
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  color: #6b5a4e;
+}
+
+.wedding-lede--small {
+  font-size: 0.95rem;
+}
+
+/* The one loud element: the names */
+.wedding-script-name {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 10vw, 3.5rem);
+  line-height: 1.05;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.wedding-parents {
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #6b5a4e;
+}
+
+.wedding-amp {
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--color-wedding-gold-dark);
+}
