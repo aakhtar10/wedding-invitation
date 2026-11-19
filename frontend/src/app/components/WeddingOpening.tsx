@@ -26,7 +26,7 @@ export default function WeddingOpening({ isOpened }: WeddingOpeningProps) {
 
     video.currentTime = 0;
     video.muted = true;
-    video.playbackRate = 1.25;
+    video.playbackRate = 1.75; // Slightly faster than normal for a snappier feel
 
     video.play().catch((error) => {
       // AbortError just means a newer play() replaced this one
