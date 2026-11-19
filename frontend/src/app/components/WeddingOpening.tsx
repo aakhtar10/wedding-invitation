@@ -47,16 +47,16 @@ export default function WeddingOpening({ isOpened }: WeddingOpeningProps) {
   return (
     <section className="relative h-[110vh] w-full overflow-hidden bg-wedding-primary">
       {/* VIDEO (poster = same image as the opening cover, so the fade is seamless) */}
-      <video
-        ref={videoRef}
-        src="/wedding/opening.mp4"
-        muted
-        playsInline
-        preload="auto"
-        onEnded={handleVideoEnd}
-        onError={handleVideoEnd}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+    <video
+  ref={videoRef}
+  src="/wedding/opening.mp4"
+  muted
+  playsInline
+  preload="auto"
+  onEnded={handleVideoEnd}
+  onError={handleVideoEnd}
+  className="absolute inset-0 z-0 h-full w-full object-cover"
+/>
 
       {/* WEDDING CONTENT */}
       <AnimatePresence>
