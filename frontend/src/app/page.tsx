@@ -5,7 +5,6 @@ import WeddingCountdown from "./components/WeddingCountdown";
 import WeddingCeremonies from "./components/WeddingCeremonies";
 import WeddingVenue from "./components/WeddingVenue";
 import WeddingClosing from "./components/WeddingClosing";
-import WeddingMusic from "./components/WeddingMusic";
 import WeddingExperience from "./components/WeddingExperience";
 
 export default function WeddingPage() {
