@@ -6,6 +6,7 @@ import WeddingCeremonies from "./components/WeddingCeremonies";
 import WeddingVenue from "./components/WeddingVenue";
 import WeddingClosing from "./components/WeddingClosing";
 import WeddingExperience from "./components/WeddingExperience";
+import WeddingCalendar from "./components/WeddingCalendar";
 
 export default function WeddingPage() {
   return (
@@ -16,6 +17,7 @@ export default function WeddingPage() {
         <WeddingCountdown />
         <WeddingCeremonies />
         <WeddingVenue />
+        <WeddingCalendar/>
         <WeddingClosing />
       </WeddingExperience>
     </main>
